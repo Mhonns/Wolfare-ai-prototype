@@ -12,7 +12,7 @@ The goal of this project is to create a tool for Security Operation Centers (SOC
 ## How to Run (Prototype)
 1. Clone the project to your machine and navigate to the `src` directory:
 ```console
-$ cd src
+$ cd src/client_scripts
 ```
 2. Install the required dependencies:
 ```console

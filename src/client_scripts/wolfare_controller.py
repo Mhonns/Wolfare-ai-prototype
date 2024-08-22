@@ -48,10 +48,8 @@ if __name__ == "__main__":
                     ui_opened = False
             if key.char == '|' and press_state == 1:
                 try:
-                    # Perform any necessary cleanup here
                     raise SystemExit
                 except SystemExit:
-                    # Handle any final actions before exit
                     sys.exit()
         except AttributeError:
             pass
