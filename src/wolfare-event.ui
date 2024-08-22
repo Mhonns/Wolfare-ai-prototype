@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>454</width>
-    <height>406</height>
+    <height>394</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,7 +60,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
+       <y>40</y>
        <width>411</width>
        <height>551</height>
       </rect>
@@ -92,13 +92,13 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>40</y>
+       <y>0</y>
        <width>411</width>
        <height>551</height>
       </rect>
      </property>
      <property name="readOnly">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="placeholderText">
       <string/>
@@ -132,22 +132,6 @@
     <string>Adding data</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="askChatbot">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>350</y>
-     <width>411</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="placeholderText">
-    <string>Text to the chatbot</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="chatsHistory">
    <property name="geometry">
     <rect>
@@ -173,14 +157,11 @@
     </property>
    </item>
   </widget>
-  <widget class="QFrame" name="data_frame">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
+  <widget class="QFrame" name="chatFrame">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>350</y>
+     <y>340</y>
      <width>411</width>
      <height>31</height>
     </rect>
@@ -191,57 +172,105 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QPushButton" name="clearButton">
+   <widget class="QTextEdit" name="askChatbot">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>110</width>
-      <height>32</height>
+      <width>351</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Clear</string>
+    <property name="placeholderText">
+     <string>Text to the chatbot</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="uploadButton">
+   <widget class="QPushButton" name="sendButton">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>350</x>
       <y>0</y>
-      <width>110</width>
+      <width>61</width>
       <height>32</height>
      </rect>
     </property>
     <property name="text">
-     <string>Upload (.json)</string>
+     <string>Send</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="finetuneButton">
+   <widget class="QFrame" name="dataFrame">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>0</x>
       <y>0</y>
-      <width>110</width>
-      <height>32</height>
+      <width>411</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Fine-tune</string>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
     </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>0</y>
-      <width>110</width>
-      <height>32</height>
-     </rect>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
-    <property name="text">
-     <string>Push</string>
-    </property>
+    <widget class="QPushButton" name="uploadButton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>0</y>
+       <width>110</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Upload (.json)</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="finetuneButton">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>0</y>
+       <width>110</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Fine-tune</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>0</y>
+       <width>110</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Push</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="clearButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>110</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
