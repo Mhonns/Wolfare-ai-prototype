@@ -1,0 +1,4 @@
+# Upload file example
+*$&*<path to the .json file>*/$&*
+
+
