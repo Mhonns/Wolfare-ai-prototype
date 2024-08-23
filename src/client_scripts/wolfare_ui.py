@@ -181,20 +181,38 @@ class UploadPath(QtWidgets.QWidget):
         self.uploadFrame.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.uploadFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.uploadFrame.setObjectName("uploadFrame")
-
         self.pathToTarget = QtWidgets.QLineEdit(self.uploadFrame)
         self.pathToTarget.setGeometry(QtCore.QRect(0, 0, 280, 25))
         self.pathToTarget.setObjectName("pathToTarget")
-
+        self.errorMessage = QtWidgets.QLabel(self)
+        self.errorMessage.setGeometry(QtCore.QRect(20, 65, 300, 25))
+        self.errorMessage.setObjectName("errorMessage")
+        self.errorMessage.setStyleSheet("color: red;")
         self.uploadButton = QtWidgets.QPushButton(self.uploadFrame)
         self.uploadButton.setGeometry(QtCore.QRect(280, 0, 70, 25))
         self.uploadButton.setObjectName("uploadButton")
         self.uploadButton.setText("Upload")
+        self.uploadButton.clicked.connect(self.uploadFile)
 
         # Optional: Add a label above the frame
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(20, 10, 400, 20))
-        self.label.setText("""Enter path to target file: (C: \ \ path \ to \ target.json)""")
+        self.label.setText("Enter path to target file: (eg." + r"C:\Path\To\Target.json)")
+
+    def uploadFile(self):
+        global ui
+        _translate = QtCore.QCoreApplication.translate
+        error_code, result = wolfare_backend.uploadFile(self.pathToTarget.text())
+        if error_code == 0:
+            ui.dataTextbox.append(_translate("Form", "+-=" + str(result) + "=-+"))
+            self.close() 
+        else:
+            self.errorMessage.setText("Error: " + result)
+
+        # Set up a button to close the alert box
+        self.close_button = QtWidgets.QPushButton("Close", self)
+        self.close_button.setGeometry(160, 150, 80, 30)
+        self.close_button.clicked.connect(self.close)
 
 if __name__ == "__main__":
     # Create the QApplication and Form
