@@ -57,7 +57,7 @@ class Ui_Form(object):
         self.chatsHistory.addItem("")
         self.chatFrame = QtWidgets.QFrame(Form)
         self.chatFrame.setGeometry(QtCore.QRect(20, 340, 411, 31))
-        self.chatFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.chatFrame.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.chatFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.chatFrame.setObjectName("chatFrame")
         self.askChatbot = QtWidgets.QTextEdit(self.chatFrame)
@@ -77,11 +77,8 @@ class Ui_Form(object):
         self.uploadButton.setGeometry(QtCore.QRect(100, 0, 110, 32))
         self.uploadButton.setObjectName("uploadButton")
         self.finetuneButton = QtWidgets.QPushButton(self.dataFrame)
-        self.finetuneButton.setGeometry(QtCore.QRect(200, 0, 110, 32))
+        self.finetuneButton.setGeometry(QtCore.QRect(300, 0, 110, 32))
         self.finetuneButton.setObjectName("finetuneButton")
-        self.pushButton = QtWidgets.QPushButton(self.dataFrame)
-        self.pushButton.setGeometry(QtCore.QRect(300, 0, 110, 32))
-        self.pushButton.setObjectName("pushButton")
         self.clearButton = QtWidgets.QPushButton(self.dataFrame)
         self.clearButton.setGeometry(QtCore.QRect(0, 0, 110, 32))
         self.clearButton.setObjectName("clearButton")
@@ -94,7 +91,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Wolfare Prime Service"))
+        Form.setWindowTitle(_translate("Form", "Wolfare Prime Interface"))
         self.newsRadButton.setText(_translate("Form", "News"))
         self.chatsRadButton.setText(_translate("Form", "Chatbot"))
         self.dataRadButton.setText(_translate("Form", "Adding data"))
@@ -104,8 +101,7 @@ class Ui_Form(object):
         self.askChatbot.setPlaceholderText(_translate("Form", "Text to the chatbot"))
         self.sendButton.setText(_translate("Form", "Send"))
         self.uploadButton.setText(_translate("Form", "Upload (.json)"))
-        self.finetuneButton.setText(_translate("Form", "Fine-tune"))
-        self.pushButton.setText(_translate("Form", "Push"))
+        self.finetuneButton.setText(_translate("Form", "Push"))
         self.clearButton.setText(_translate("Form", "Clear"))
         self.latestNewsLabel.setText(_translate("Form", "News updated: Loading"))
 
@@ -113,14 +109,18 @@ class Ui_Form(object):
         self.newsRadButton.clicked.connect(lambda :self.openPanal(0))
         self.chatsRadButton.clicked.connect(lambda :self.openPanal(1))
         self.dataRadButton.clicked.connect(lambda :self.openPanal(2))
-        self.sendButton.clicked.connect(lambda :self.openPanal(2))
+        self.sendButton.clicked.connect(self.sendPrompt)
+        self.chatsHistory.currentTextChanged.connect(self.loadChatCache)
+        self.clearButton.clicked.connect(self.dataTextbox.clear)
+        self.uploadButton.clicked.connect(lambda :self.openFile())
+        self.finetuneButton.clicked.connect(self.pushToCloud)
         # Fix the ui size
         Form.setFixedSize(454, 406)
         # News section init
         self.newsRadButton.setChecked(True)
         self.clearAllPanal()
         self.openPanal(0)
-    
+        
     def clearAllPanal(self):
         # Hide all text box
         self.newsTextbox.hide()
@@ -135,9 +135,13 @@ class Ui_Form(object):
 
     def openPanal(self, op):
         self.clearAllPanal()
-        if op == 0: # News button was selected
+        _translate = QtCore.QCoreApplication.translate
+        if op == 0: # News radio was selected
             self.newsTextbox.show()
             self.latestNewsLabel.show()
+            date, news = wolfare_backend.fetchNews()
+            self.latestNewsLabel.setText(_translate("Form", "News updated: " + date))
+            self.newsTextbox.setText(news)
         if op == 1: # Chatbot button was selected
             self.chatbotTextbox.show()
             self.chatsHistory.show()
@@ -145,6 +149,52 @@ class Ui_Form(object):
         if op == 2: # Adding Data button was selected
             self.dataTextbox.show()
             self.dataFrame.show()
+
+    def loadChatCache(self):
+        _translate = QtCore.QCoreApplication.translate
+        selected_history = self.chatsHistory.currentText()
+        self.chatbotTextbox.setText(_translate("Form", wolfare_backend.history_cache[selected_history]))
+
+    def sendPrompt(self):
+        _translate = QtCore.QCoreApplication.translate
+        user_text = self.askChatbot.toPlainText()
+        self.chatbotTextbox.append(_translate("Form", "User: " + user_text))
+        output = wolfare_backend.sendPrompt(user_text)
+        self.chatbotTextbox.append(_translate("Form", "Chatbot: " + output))
+        self.askChatbot.setText(_translate("Form", ""))
+        wolfare_backend.saveCache(self.chatsHistory.currentText(), self.chatbotTextbox.toPlainText())
+
+    def openFile(self):
+        self.new_window = UploadPath()
+        self.new_window.show()
+
+    def pushToCloud(self):
+        wolfare_backend.pushToCloud(self.dataTextbox.toPlainText())
+
+class UploadPath(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(400, 100)
+        self.setWindowTitle("Upload path")
+        self.uploadFrame = QtWidgets.QFrame(self)
+        self.uploadFrame.setGeometry(QtCore.QRect(20, 40, 360, 31))
+        self.uploadFrame.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.uploadFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.uploadFrame.setObjectName("uploadFrame")
+
+        self.pathToTarget = QtWidgets.QLineEdit(self.uploadFrame)
+        self.pathToTarget.setGeometry(QtCore.QRect(0, 0, 280, 25))
+        self.pathToTarget.setObjectName("pathToTarget")
+
+        self.uploadButton = QtWidgets.QPushButton(self.uploadFrame)
+        self.uploadButton.setGeometry(QtCore.QRect(280, 0, 70, 25))
+        self.uploadButton.setObjectName("uploadButton")
+        self.uploadButton.setText("Upload")
+
+        # Optional: Add a label above the frame
+        self.label = QtWidgets.QLabel(self)
+        self.label.setGeometry(QtCore.QRect(20, 10, 400, 20))
+        self.label.setText("""Enter path to target file: (C: \ \ path \ to \ target.json)""")
 
 if __name__ == "__main__":
     # Create the QApplication and Form
