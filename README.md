@@ -10,6 +10,8 @@ The goal of this project is to create a tool for Security Operation Centers (SOC
 - Train the chatbot with specific cyber security knowledge.
 
 ## How to Run (Prototype)
+0. Prerequisites
+Please ensure that python3, python3-pip were installed which enable to be executed via CLI.
 1. Clone the project to your machine and navigate to the `src` directory:
 ```console
 $ cd src/client_scripts
