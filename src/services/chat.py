@@ -30,7 +30,7 @@ class SolarHackerNews:
         except Exception as e:
             logger.error(f"Error in API call: {e}")
             return {"error": str(e)}
-
+    #not finished yet
     def summarize_story(self, story: Dict[str, Any]) -> str:
         messages = [
             {"role": "system", "content": "You are an AI assistant specialized in summarizing HackerNews stories."},
@@ -57,7 +57,7 @@ class SolarHackerNews:
         if "choices" in result and len(result["choices"]) > 0:
             return result["choices"][0]["message"]["content"]
         return ""
-
+    
     def embed_query(self, text: str) -> List[float]:
         response = self.client.embeddings.create(
             model="solar-embedding-1-large-query",
@@ -71,7 +71,7 @@ class SolarHackerNews:
             input=text
         )
         return response.data[0].embedding
-
+    #not finished yet
     def analyze_user_query(self, query: str) -> Dict[str, Any]:
         logger.debug(f"Analyzing query: {query}")
         messages = [
@@ -110,7 +110,7 @@ class SolarHackerNews:
             logger.error(f"Error in analyze_user_query: {e}")
         
         return {"key_points": [], "related_topics": [], "keywords": []}
-
+    #not finished yet
     def generate_response(self, query: str, search_results: List[Dict[str, Any]]) -> Dict[str, Any]:
         context = "\n".join([f"Story {i+1}: {json.dumps(result)}" for i, result in enumerate(search_results)])
         
@@ -182,24 +182,24 @@ class SolarHackerNews:
         
         return final_result
 
-if __name__ == "__main__":
-    solar_hn = SolarHackerNews()
+# if __name__ == "__main__":
+#     solar_hn = SolarHackerNews()
     
-    # Example story
-    example_story = {
-        "id": "19121",
-        "title": "Ask HN: Reasonable dev laptop?",
-        "by": "raihansaputra",
-        "text": "So my 2015 Retina MacBook Pro just broke. My fault, my shoddily mounted monitor fell over and hit the laptop, breaking the screen. As I probably won't qualify for the 'Staingate' replacements, footing $600+ for a display replacement is just a bit too much. I'm also looking to move away from Apple products. I'm looking for a reasonable laptop to buy, not looking for the latest specs, just one that can run Ubuntu, have a long battery life (>6 hours preferably), and can handle Modern web browsing (webapps and stuff). Preferably not too heavy to lug around. I'm doing light dev work on Django and trying to learn React/Angular. I'm kinda interested in getting older thinkpads (t430/x230s) but concerned on the battery life part. If any of you have any suggestions, it would be great."
-    }
+#    
+#     example_story = {
+#         "id": "19121",
+#         "title": "Ask HN: Reasonable dev laptop?",
+#         "by": "raihansaputra",
+#         "text": "So my 2015 Retina MacBook Pro just broke. My fault, my shoddily mounted monitor fell over and hit the laptop, breaking the screen. As I probably won't qualify for the 'Staingate' replacements, footing $600+ for a display replacement is just a bit too much. I'm also looking to move away from Apple products. I'm looking for a reasonable laptop to buy, not looking for the latest specs, just one that can run Ubuntu, have a long battery life (>6 hours preferably), and can handle Modern web browsing (webapps and stuff). Preferably not too heavy to lug around. I'm doing light dev work on Django and trying to learn React/Angular. I'm kinda interested in getting older thinkpads (t430/x230s) but concerned on the battery life part. If any of you have any suggestions, it would be great."
+#     }
     
-    # Summarize the story
-    summary = solar_hn.summarize_story(example_story)
-    print("Story summary:", summary)
+#     # Summarize the story
+#     summary = solar_hn.summarize_story(example_story)
+#     print("Story summary:", summary)
     
-    # Example query
-    query = "What are some good laptop recommendations for developers?"
+#     # Example query
+#     query = "What are some good laptop recommendations for developers?"
     
-    # Process the query (assuming you have a vector_db set up)
-    # result = solar_hn.process_query(query, vector_db)
-    # print("Query result:", result)
+#     # Process the query (assuming you have a vector_db set up)
+#     # result = solar_hn.process_query(query, vector_db)
+#     # print("Query result:", result)
