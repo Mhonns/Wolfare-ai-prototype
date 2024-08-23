@@ -5,6 +5,9 @@
 #                       Created by Nathadon Samairat 23 August 2024
 
 import requests
+import json
+import os
+
 server_ip = "x.x.x.x"
 server_port = "xxxx"
 server_url = server_ip + ":" + server_port
@@ -34,9 +37,6 @@ def sendRequest(method, message):
                 return "Error while getting the output" + str(response.status_code)
     except:
         return "Error while sending the request"
-
-def sanitizer():
-    pass
 
 def newsFormater(data):
     # TODO please format the news data
@@ -77,3 +77,17 @@ def pushToCloud(data):
         return output
     else:
         return "Waiting for the previous data to train our model and verifying. please try again"
+    
+def uploadFile(path_file):
+    print(path_file)
+    if not path_file.lower().endswith('.json'):
+        return 2, "The file is not a JSON file."
+    try:
+        with open(path_file, 'r', encoding='utf-8') as file:
+            data = file.read()
+        json_data = json.loads(data)
+        return 0, json_data
+    except json.JSONDecodeError as e:
+        return 3, str(e)
+    except Exception as e:
+        return 4, str(e)
