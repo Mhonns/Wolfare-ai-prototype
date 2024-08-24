@@ -15,7 +15,6 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.setEnabled(True)
-        Form.resize(454, 394)
         self.newsRadButton = QtWidgets.QRadioButton(Form)
         self.newsRadButton.setGeometry(QtCore.QRect(20, 20, 70, 20))
         self.newsRadButton.setObjectName("newsRadButton")
@@ -74,10 +73,10 @@ class Ui_Form(object):
         self.dataFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.dataFrame.setObjectName("dataFrame")
         self.uploadButton = QtWidgets.QPushButton(self.dataFrame)
-        self.uploadButton.setGeometry(QtCore.QRect(100, 0, 110, 32))
+        self.uploadButton.setGeometry(QtCore.QRect(300, 0, 110, 32))
         self.uploadButton.setObjectName("uploadButton")
         self.finetuneButton = QtWidgets.QPushButton(self.dataFrame)
-        self.finetuneButton.setGeometry(QtCore.QRect(300, 0, 110, 32))
+        self.finetuneButton.setGeometry(QtCore.QRect(100, 0, 110, 32))
         self.finetuneButton.setObjectName("finetuneButton")
         self.clearButton = QtWidgets.QPushButton(self.dataFrame)
         self.clearButton.setGeometry(QtCore.QRect(0, 0, 110, 32))
@@ -85,6 +84,10 @@ class Ui_Form(object):
         self.latestNewsLabel = QtWidgets.QLabel(Form)
         self.latestNewsLabel.setGeometry(QtCore.QRect(20, 340, 411, 31))
         self.latestNewsLabel.setObjectName("latestNewsLabel")
+        self.errorMessage = QtWidgets.QLabel(Form)
+        self.errorMessage.setGeometry(QtCore.QRect(20, 370, 350, 25))
+        self.errorMessage.setObjectName("errorMessage")
+        self.errorMessage.setStyleSheet("color: red;")
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -104,6 +107,8 @@ class Ui_Form(object):
         self.finetuneButton.setText(_translate("Form", "Push"))
         self.clearButton.setText(_translate("Form", "Clear"))
         self.latestNewsLabel.setText(_translate("Form", "News updated: Loading"))
+        with open("data-placeholder.txt") as file:
+            self.dataTextbox.setPlaceholderText(_translate("Form", file.read()))
 
         # Event listeners
         self.newsRadButton.clicked.connect(lambda :self.openPanal(0))
@@ -201,11 +206,9 @@ class UploadPath(QtWidgets.QWidget):
 
     def uploadFile(self):
         global ui
-        _translate = QtCore.QCoreApplication.translate
         error_code, result = wolfare_backend.uploadFile(self.pathToTarget.text())
         if error_code == 0:
-            ui.dataTextbox.append(_translate("Form", "+-=" + str(result) + "=-+"))
-            self.close() 
+            self.close()
         else:
             self.errorMessage.setText("Error: " + result)
 
