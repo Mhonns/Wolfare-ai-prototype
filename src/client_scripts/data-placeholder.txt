@@ -1,2 +1,18 @@
-# Upload file example
-*$&*<path to the .json file>*/$&*
+# Upload json in this format
+[
+    {
+        "id": "1",
+        "vector": [],
+        "metadata": {
+            "article_id": "1",
+            "title": "Title",
+            "source": "",
+            "time": 1446564005,
+            "by": "username",
+            "type": "story",
+            "text": "Your story goes here",
+            "chunk_index": null
+        }
+    }
+]
+# To add your own prompt or sumarization is underdevelopment process.
