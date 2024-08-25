@@ -76,14 +76,13 @@ class SolarHackerNews:
         )
         return response.data[0].embedding
     
-    #not finished yet
     def analyze_user_query(self, query: str) -> Dict[str, Any]:
         #logger.debug(f"Analyzing query: {query}")
         messages = [
-            {"role": "system", "content": "You are an intelligent AI assistant specialized in analyzing user queries about Cyber Security news."},
+            {"role": "system", "content": "You are an intelligent AI assistant specialized in analyzing user queries about Cyber Security-related information."},
             {"role": "user", "content": 
              f"""Analyze the following user query and provide search results:
-                1. At least 3 key points to look for in Cyber Security news
+                1. At least 3 key points to look for in Cyber Security information
                 2. Possible related topics or categories
                 3. At least 5 exact keywords for searching
 
@@ -187,9 +186,9 @@ class SolarHackerNews:
         context = "\n".join([f"Story {i+1}: {json.dumps(result)}" for i, result in enumerate(search_results)])
         
         messages = [
-            {"role": "system", "content": "You are an intelligent AI assistant specialized in answering questions about Cyber Security news"},
+            {"role": "system", "content": "You are an intelligent AI assistant named Wolfare specialized in answering questions about Cyber Security."},
             {"role": "user", "content": 
-             f"""Answer the following query based on the provided Cyber Security news. Focus on extracting and presenting specific information from the stories.
+             f"""Wolfare can answer the following query based on the provided Cyber Security news, trends, manual, techniques, vulnerabilities and information.. Focus on extracting and presenting specific information from the news and various sources.
                 Include references to the source stories.
 
                 Context: {context}
@@ -203,7 +202,14 @@ class SolarHackerNews:
                     ],
                     "confidence": 0.0 
                 }}
-                // Confidence score between 0-1
+            
+                Rules:
+                1. Your entire response must be a valid JSON object.
+                2. The "answer" field should contain your detailed response to the user's query.
+                3. The "references" field should be an array of objects, each containing "document" and "relevance" fields.
+                4. The "confidence" field should be a number between 0 and 1, indicating your confidence in the answer.
+                5. Ensure all JSON syntax is correct, including quotes around strings and proper use of commas.
+                6. Do not include any text outside of the JSON object in your response.
              """
             }
         ]
@@ -338,6 +344,60 @@ class SolarHackerNews:
         except Exception as e:
             print(f"Error in groundedness check: {e}")
             return {"score": 0.0, "feedback": "Error in groundedness check"}
+    
+    def self_evaluate(self, query: str, response: Dict[str, Any], search_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+        context = "\n".join([f"Document {i+1}: {result['document']}" for i, result in enumerate(search_results)])
+        
+        messages = [
+            {"role": "system", "content": "You are an AI assistant specialized in evaluating responses to cyber security-related queries."},
+            {"role": "user", "content": 
+             f"""Evaluate the following response to the user query. Consider the relevance, accuracy, and completeness of the answer based on the provided context.
+
+                User query: {query}
+
+                Context:
+                {context}
+
+                Response:
+                {json.dumps(response, indent=2)}
+
+                Provide your evaluation in JSON format:
+                {{
+                    "evaluation_score": 0.0,  
+                    "feedback": "Your detailed feedback here",
+                    "suggestions_for_improvement": ["suggestion1", "suggestion2"]
+                }}
+                // evaluation_score should be between 0 and 1
+             """
+            }
+        ]
+        result = self.call_api(messages)
+        if "choices" in result and len(result["choices"]) > 0:
+            content = result["choices"][0]["message"]["content"]
+            
+            # Try to extract JSON from the content
+            try:
+                json_match = re.search(r'\{.*\}', content, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(0)
+                    return json.loads(json_str)
+                else:
+                    raise ValueError("No JSON object found in the response")
+            except json.JSONDecodeError as e:
+                print(f"JSON Decode Error: {e}")
+                print(f"Problematic content: {content}")
+            except ValueError as e:
+                print(f"Value Error: {e}")
+                print(f"Problematic content: {content}")
+            
+            # If JSON parsing fails, return a default structure
+            return {
+                "evaluation_score": 0.5,
+                "feedback": "Unable to parse evaluation. Please check the response format.",
+                "suggestions_for_improvement": ["Ensure the response is in correct JSON format"]
+            }
+        
+        return {"evaluation_score": 0.0, "feedback": "Unable to evaluate", "suggestions_for_improvement": []}
 
     def process_query(self, query: str, vector_db) -> Dict[str, Any]:
         try:
