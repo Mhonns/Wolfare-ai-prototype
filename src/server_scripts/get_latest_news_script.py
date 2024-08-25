@@ -173,4 +173,13 @@ Hacker News content to analyze:
     chain = {"text": RunnablePassthrough()} | messages | llm | parser
     return chain.invoke(x[0]) # Change the number of content here
 
-print(getLatestNews())
+current_datetime = datetime.now()
+temp_date = current_datetime.strftime("%d-%m-%Y")
+fetched_news = getLatestNews()
+def getLastestWithDate(last_update):
+    global temp_date
+    global fetched_news
+    if temp_date != last_update:
+        temp_date = last_update
+        fetched_news = getLatestNews()
+    return temp_date, fetched_news
