@@ -1,11 +1,11 @@
 #from src.pages import wolfare_controller
 from src.utils.config import load_environment_variables
 from src.database.vector_db import vector_db
-from src.services.chat import SolarHackerNews
+from src.services.chat import solar_hn
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-solar_hn = SolarHackerNews()
+
 def main():
     load_environment_variables()
     
