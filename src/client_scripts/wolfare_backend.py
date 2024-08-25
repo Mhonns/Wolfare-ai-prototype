@@ -62,11 +62,10 @@ def newsFormater(json_string):
     html = ""
     # Title
     html += f"<title>{data['title']['original']}</title>\n"
-    
     # Type
     html += f"<h1>Type</h1>\n"
     html += f"<p>{data['type']}</p>\n"
-
+    
     # Overview
     html += f"<h2>Overview</h2>\n"
     html += f"<p>{data['overview']}</p>\n"

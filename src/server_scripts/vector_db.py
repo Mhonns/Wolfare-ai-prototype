@@ -3,7 +3,7 @@ import json
 import uuid
 import chromadb
 from typing import Dict, Any, List
-from src.services.chat import SolarHackerNews
+from services.chat import SolarHackerNews
 
 '''
    {
