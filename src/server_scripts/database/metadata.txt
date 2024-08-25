@@ -1,0 +1,16 @@
+'''
+   {
+        "id": "19123",
+        "vector": [],
+        "metadata": {
+            "article_id": "19123",
+            "title": "Ask HN: Should new grad go to startup or big company?",
+            "source": "",
+            "time": 1540081436,
+            "by": "ziyun",
+            "type": "story",
+            "text": "I will be graduating next semester. This would be the job hunting season. Just wondering if any of you have suggestions. Should I head into the startups or big company? Thanks!",
+            "chunk_index": null
+        }
+    },
+'''

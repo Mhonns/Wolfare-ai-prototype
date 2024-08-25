@@ -58,4 +58,5 @@ async def hacker(request: Request):
     return {"message": "There's nothing here XD. and we may collect your ip " + client_host}
 
 if __name__ == "__main__":
+    
     uvicorn.run(app, host="127.0.0.1", port=2546)
