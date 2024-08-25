@@ -2,9 +2,9 @@ from fastapi import FastAPI, Request
 import uvicorn
 from pydantic import BaseModel
 from typing import List, Optional
-# TODO import llm
+import get_latest_news_script
+from datetime import datetime
 
-lastest_update = "24-08-2024"
 app = FastAPI()
 
 class Message(BaseModel):
@@ -30,8 +30,9 @@ async def root():
     return {"message": "API server is working"}
 
 @app.get("/api/news")
-async def getNews():
-    output = "TODO result from the llm" # TODO get the result form the llm 
+async def getNews():    
+    temp_update = datetime.now().strftime("%d-%m-%Y")
+    lastest_update, output = get_latest_news_script.getLastestWithDate(temp_update)
     return {"date" : lastest_update, "output" : output}
 
 @app.post("/api/prompt")
