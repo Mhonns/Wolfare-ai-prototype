@@ -36,7 +36,7 @@ def sendRequest(method, message=None):
             response = requests.post(server_url + "/api/prompt", json={"content": message})
             if response.status_code == 200:
                 data = response.json()
-                output = str(data.get("output"))
+                output = data.get("output")
                 return output
             else:
                 return "Error while getting the output" + str(response.status_code)
@@ -87,7 +87,7 @@ def newsFormater(json_string):
     html += f"<h2>Technical Details</h2>\n"
     html += f"<p>CVE IDs: {', '.join(data['technical_details']['cve_ids']) if data['technical_details']['cve_ids'] else 'None'}</p>\n"
     html += f"<p>IOCs: {', '.join(data['technical_details']['iocs']) if data['technical_details']['iocs'] else 'None'}</p>\n"
-    html += f"<p>Affected Versions: {', '.join(data['technical_details']['affected_versions'])}</p>\n"
+    # html += f"<p>Affected Versions: {', '.join(data['technical_details']['affected_versions'])}</p>\n"
 
     # Actionable Insights
     html += f"<h2>Actionable Insights</h2>\n"

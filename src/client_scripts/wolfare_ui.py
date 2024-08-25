@@ -163,7 +163,7 @@ class Ui_Form(object):
     def sendPrompt(self):
         _translate = QtCore.QCoreApplication.translate
         user_text = self.askChatbot.toPlainText()
-        self.chatbotTextbox.append(_translate("Form", "User: " + user_text))
+        self.chatbotTextbox.append(_translate("Form", "User: " + user_text + "\n"))
         output = wolfare_backend.sendPrompt(user_text)
         self.chatbotTextbox.append(_translate("Form", "Chatbot: " + output))
         self.askChatbot.setText(_translate("Form", ""))

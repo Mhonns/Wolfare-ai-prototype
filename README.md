@@ -44,3 +44,7 @@ $ pip3 install -r requirements.txt
 ```console
 $ python3 api_server.py
 ```
+## Manual 
+0. After running the server, To open the GUI press ctrl + h on the keyboard.
+1. To close the gui please ctrl + once again.
+2. To close the service user can

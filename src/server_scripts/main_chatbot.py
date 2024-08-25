@@ -6,7 +6,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-def main():
+def main(prompt: str):
     load_environment_variables()
     
     # Load data from JSON file
@@ -27,29 +27,48 @@ def main():
     # print(f"Saved {len(saved_ids)} chunks from {pdf_path} to Chroma DB")
 
 
-    while True:
-        query = input("\nEnter your question: ").strip()
+    # while True:
+    #     query = input("\nEnter your question: ").strip()
         
-        if query.lower() == 'exit':
-            print("Thank you for using our Cyber Security News Chatbot")
-            break
+    #     if query.lower() == 'exit':
+    #         print("Thank you for using our Cyber Security News Chatbot")
+    #         break
 
-        try:
-            result = solar_hn.process_query(query, vector_db)
-            
-            print("\nAnswer:", result["answer"])
-            
-            if result["references"]:
-                print("\nReferences:")
-                for ref in result["references"]:
-                    print(f"- Story ID: {ref['story_id']}, Relevance: {ref['relevance']}")
-            
-            print(f"\nConfidence: {result['confidence']:.2f}")
+    # try:
+    #     result = solar_hn.process_query(query, vector_db)
         
-        except Exception as e:
-            logger.error(f"Error processing query: {e}")
-            print("Sorry, an error occurred while processing your query. Please try again.")
+    #     print("\nAnswer:", result["answer"])
+        
+    #     if result["references"]:
+    #         print("\nReferences:")
+    #         for ref in result["references"]:
+    #             print(f"- Story ID: {ref['story_id']}, Relevance: {ref['relevance']}")
+        
+    #     print(f"\nConfidence: {result['confidence']:.2f}")
+    
+    # except Exception as e:
+    #     logger.error(f"Error processing query: {e}")
+    #     print("Sorry, an error occurred while processing your query. Please try again.")
+    e = ""
+    query = prompt.strip()
 
+    try:
+        result = solar_hn.process_query(query, vector_db)
+        
+        print("\nAnswer:", result["answer"])
+        
+        if result["references"]:
+            print("\nReferences:")
+            for ref in result["references"]:
+                print(f"- Story ID: {ref['story_id']}, Relevance: {ref['relevance']}")
+        
+        print(f"\nConfidence: {result['confidence']:.2f}")
+    
+    except Exception as e:
+        logger.error(f"Error processing query: {e}")
+        print("Sorry, an error occurred while processing your query. Please try again.")
 
-if __name__ == "__main__":
-    main()
+    return f'{e}', result["answer"], f"\nConfidence: {result['confidence']:.2f}"
+
+# if __name__ == "__main__":
+#     main()

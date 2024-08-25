@@ -2,8 +2,10 @@ from fastapi import FastAPI, Request
 import uvicorn
 from pydantic import BaseModel
 from typing import List, Optional
-import get_latest_news_script
 from datetime import datetime
+
+import get_latest_news_script
+import main_chatbot
 
 app = FastAPI()
 
@@ -37,8 +39,13 @@ async def getNews():
 
 @app.post("/api/prompt")
 async def promptReq(message: Message):
-    prompt = {message.content}
-    output = f"TODO send the {prompt} message to the llm" # TODO send the prompt to the model and wait
+    prompt = message.content
+    print(prompt)
+    e, output, confident = main_chatbot.main(prompt)
+    if e != "":
+        output = e
+    else:
+        output = output + "\n" + confident
     return {"output" : output}
 
 @app.post("/api/add_data")
