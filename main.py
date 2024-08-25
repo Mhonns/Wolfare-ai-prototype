@@ -1,11 +1,12 @@
 #from src.pages import wolfare_controller
 from src.utils.config import load_environment_variables
 from src.database.vector_db import vector_db
-#import os
+from src.services.chat import SolarHackerNews
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+solar_hn = SolarHackerNews()
 def main():
-    #vector_db = VectorDB()
-
-    # Load environment variables
     load_environment_variables()
     
     # Load data from JSON file
@@ -20,20 +21,34 @@ def main():
     # saved_ids = vector_db.save_multiple_to_vector_db(sampled_data)
     # print(f"Saved {len(saved_ids)} stories to Chroma DB")
 
-    # Save a single PDF
-    pdf_path = "GlobalThreatReport2024.pdf"
-    saved_ids = vector_db.save_pdf_to_vector_db(pdf_path)
-    print(f"Saved {len(saved_ids)} chunks from {pdf_path} to Chroma DB")
+    # # Save a single PDF
+    # pdf_path = "GlobalThreatReport2024.pdf"
+    # saved_ids = vector_db.save_pdf_to_vector_db(pdf_path)
+    # print(f"Saved {len(saved_ids)} chunks from {pdf_path} to Chroma DB")
 
 
-    query = "how to privilege escalation in linux" 
-    results = vector_db.query_vector_db(query, n_results=3, filter_condition={"type": "pdf"})
-    for i, (doc, metadata, distance) in enumerate(zip(results['documents'][0], results['metadatas'][0], results['distances'][0]), 1):
-        print(f"\nResult {i}:")
-        print(f"Distance: {distance}")
-        print(f"Source: {metadata['source']}")
-        print(f"Chunk: {metadata['chunk']}")
-        print(f"Text preview: {doc[:300]}...")
+    while True:
+        query = input("\nEnter your question: ").strip()
+        
+        if query.lower() == 'exit':
+            print("Thank you for using our Cyber Security News Chatbot")
+            break
+
+        try:
+            result = solar_hn.process_query(query, vector_db)
+            
+            print("\nAnswer:", result["answer"])
+            
+            if result["references"]:
+                print("\nReferences:")
+                for ref in result["references"]:
+                    print(f"- Story ID: {ref['story_id']}, Relevance: {ref['relevance']}")
+            
+            print(f"\nConfidence: {result['confidence']:.2f}")
+        
+        except Exception as e:
+            logger.error(f"Error processing query: {e}")
+            print("Sorry, an error occurred while processing your query. Please try again.")
 
 
 if __name__ == "__main__":

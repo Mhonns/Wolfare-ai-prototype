@@ -25,38 +25,38 @@ class SolarHackerNews:
                 messages=messages
             )
             response_dict = response.model_dump()
-            logger.debug(f"API response: {response_dict}")
+            #logger.debug(f"API response: {response_dict}")
             return response_dict
         except Exception as e:
             logger.error(f"Error in API call: {e}")
             return {"error": str(e)}
-    #not finished yet
-    def summarize_story(self, story: Dict[str, Any]) -> str:
-        messages = [
-            {"role": "system", "content": "You are an AI assistant specialized in summarizing HackerNews stories."},
-            {"role": "user", "content": 
-            f"""Please analyze the following HackerNews story and structure your summary in JSON format with the following elements:
-                {{
-                    "title": "The title of the story",
-                    "author": "The author of the story",
-                    "overview": "A concise overview of the story's main points in 2-3 sentences",
-                    "key_topics": [
-                        "Topic 1",
-                        "Topic 2",
-                        "Topic 3"
-                    ],
-                    "potential_impact": "Brief description of the story's potential impact or significance"
-                }}
+    
+    # def summarize_story(self, story: Dict[str, Any]) -> str:
+    #     messages = [
+    #         {"role": "system", "content": "You are an AI assistant specialized in summarizing  Cyber Security news."},
+    #         {"role": "user", "content": 
+    #         f"""Please analyze the following Cyber Security news and structure your summary in JSON format with the following elements:
+    #             {{
+    #                 "title": "The title of the story",
+    #                 "author": "The author of the story",
+    #                 "overview": "A concise overview of the story's main points in 2-3 sentences",
+    #                 "key_topics": [
+    #                     "Topic 1",
+    #                     "Topic 2",
+    #                     "Topic 3"
+    #                 ],
+    #                 "potential_impact": "Brief description of the story's potential impact or significance"
+    #             }}
 
-                Here's the story to analyze:
-                {json.dumps(story)}
-            """
-            }
-        ]
-        result = self.call_api(messages)
-        if "choices" in result and len(result["choices"]) > 0:
-            return result["choices"][0]["message"]["content"]
-        return ""
+    #             Here's the story to analyze:
+    #             {json.dumps(story)}
+    #         """
+    #         }
+    #     ]
+    #     result = self.call_api(messages)
+    #     if "choices" in result and len(result["choices"]) > 0:
+    #         return result["choices"][0]["message"]["content"]
+    #     return ""
     
     def embed_query(self, text: str) -> List[float]:
         response = self.client.embeddings.create(
@@ -71,14 +71,15 @@ class SolarHackerNews:
             input=text
         )
         return response.data[0].embedding
+    
     #not finished yet
     def analyze_user_query(self, query: str) -> Dict[str, Any]:
-        logger.debug(f"Analyzing query: {query}")
+        #logger.debug(f"Analyzing query: {query}")
         messages = [
-            {"role": "system", "content": "You are an intelligent AI assistant specialized in analyzing user queries about HackerNews stories."},
+            {"role": "system", "content": "You are an intelligent AI assistant specialized in analyzing user queries about Cyber Security news."},
             {"role": "user", "content": 
              f"""Analyze the following user query and provide search results:
-                1. At least 3 key points to look for in HackerNews stories
+                1. At least 3 key points to look for in Cyber Security news
                 2. Possible related topics or categories
                 3. At least 5 exact keywords for searching
 
@@ -110,14 +111,15 @@ class SolarHackerNews:
             logger.error(f"Error in analyze_user_query: {e}")
         
         return {"key_points": [], "related_topics": [], "keywords": []}
+    
     #not finished yet
     def generate_response(self, query: str, search_results: List[Dict[str, Any]]) -> Dict[str, Any]:
         context = "\n".join([f"Story {i+1}: {json.dumps(result)}" for i, result in enumerate(search_results)])
         
         messages = [
-            {"role": "system", "content": "You are an intelligent AI assistant specialized in answering questions about HackerNews stories."},
+            {"role": "system", "content": "You are an intelligent AI assistant specialized in answering questions about Cyber Security news"},
             {"role": "user", "content": 
-             f"""Answer the following query based on the provided HackerNews stories. Focus on extracting and presenting specific information from the stories.
+             f"""Answer the following query based on the provided Cyber Security news. Focus on extracting and presenting specific information from the stories.
                 Include references to the source stories.
 
                 Context: {context}
@@ -157,21 +159,89 @@ class SolarHackerNews:
             "references": [],
             "confidence": 0.0
         }
+    
+    def hybrid_search(self, query_embedding: List[float], keywords: List[str], vector_db, n_results: int = 5) -> List[Dict[str, Any]]:
+        #logger.debug(f"Performing hybrid search with query embedding length: {len(query_embedding)} and keywords: {keywords}")
+        
+        # Perform semantic search
+        try:
+            semantic_results = vector_db.collection.query(
+                query_embeddings=[query_embedding],
+                n_results=n_results * 2,
+                include=["documents", "metadatas", "distances"]
+            )
+            #logger.debug("Semantic search successful")
+        except Exception as e:
+            logger.error(f"Semantic search failed with error: {str(e)}")
+            semantic_results = {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
+
+        # Perform keyword search
+        try:
+            keyword_query = " OR ".join(keywords)
+            keyword_results = vector_db.collection.query(
+                query_texts=[keyword_query],
+                n_results=n_results * 2,
+                include=["documents", "metadatas", "distances"]
+            )
+            #logger.debug("Keyword search successful")
+        except Exception as e:
+            logger.error(f"Keyword search failed with error: {str(e)}")
+            keyword_results = {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
+
+        # Combine and re-rank results
+        combined_results = []
+        seen_ids = set()
+
+        for sem_idx, key_idx in zip(range(len(semantic_results['ids'][0])), range(len(keyword_results['ids'][0]))):
+            if sem_idx < len(semantic_results['ids'][0]):
+                sem_id = semantic_results['ids'][0][sem_idx]
+                if sem_id not in seen_ids:
+                    seen_ids.add(sem_id)
+                    try:
+                        document = json.loads(semantic_results['documents'][0][sem_idx])
+                    except json.JSONDecodeError:
+                        document = semantic_results['documents'][0][sem_idx]
+                    combined_results.append({
+                        'id': sem_id,
+                        'document': document,
+                        'metadata': semantic_results['metadatas'][0][sem_idx],
+                        'score': 0.7 * (1 - semantic_results['distances'][0][sem_idx])
+                    })
+
+            if key_idx < len(keyword_results['ids'][0]):
+                key_id = keyword_results['ids'][0][key_idx]
+                if key_id not in seen_ids:
+                    seen_ids.add(key_id)
+                    try:
+                        document = json.loads(keyword_results['documents'][0][key_idx])
+                    except json.JSONDecodeError:
+                        document = keyword_results['documents'][0][key_idx]
+                    combined_results.append({
+                        'id': key_id,
+                        'document': document,
+                        'metadata': keyword_results['metadatas'][0][key_idx],
+                        'score': 0.3 * (1 - keyword_results['distances'][0][key_idx])
+                    })
+
+        # Sort by score and return top n_results
+        combined_results.sort(key=lambda x: x['score'], reverse=True)
+        return combined_results[:n_results]
 
     def process_query(self, query: str, vector_db) -> Dict[str, Any]:
-        logger.debug(f"Processing query: {query}")
+        #logger.debug(f"Processing query: {query}")
         
         analysis = self.analyze_user_query(query)
         query_embedding = self.embed_query(query)
         
-        logger.debug("Performing hybrid search")
-        search_results = vector_db.hybrid_search(
+        #logger.debug("Performing hybrid search")
+        search_results = self.hybrid_search(
             query_embedding=query_embedding,
             keywords=analysis.get('keywords', []),
+            vector_db=vector_db,
             n_results=5
         )
         
-        logger.debug("Generating response")
+        #logger.debug("Generating response")
         response = self.generate_response(query, search_results)
 
         final_result = {
@@ -181,25 +251,4 @@ class SolarHackerNews:
         }
         
         return final_result
-
-# if __name__ == "__main__":
-#     solar_hn = SolarHackerNews()
     
-#    
-#     example_story = {
-#         "id": "19121",
-#         "title": "Ask HN: Reasonable dev laptop?",
-#         "by": "raihansaputra",
-#         "text": "So my 2015 Retina MacBook Pro just broke. My fault, my shoddily mounted monitor fell over and hit the laptop, breaking the screen. As I probably won't qualify for the 'Staingate' replacements, footing $600+ for a display replacement is just a bit too much. I'm also looking to move away from Apple products. I'm looking for a reasonable laptop to buy, not looking for the latest specs, just one that can run Ubuntu, have a long battery life (>6 hours preferably), and can handle Modern web browsing (webapps and stuff). Preferably not too heavy to lug around. I'm doing light dev work on Django and trying to learn React/Angular. I'm kinda interested in getting older thinkpads (t430/x230s) but concerned on the battery life part. If any of you have any suggestions, it would be great."
-#     }
-    
-#     # Summarize the story
-#     summary = solar_hn.summarize_story(example_story)
-#     print("Story summary:", summary)
-    
-#     # Example query
-#     query = "What are some good laptop recommendations for developers?"
-    
-#     # Process the query (assuming you have a vector_db set up)
-#     # result = solar_hn.process_query(query, vector_db)
-#     # print("Query result:", result)

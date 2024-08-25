@@ -8,22 +8,6 @@ from src.services.chat import SolarHackerNews
 import pypdf
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-'''
-   {
-        "id": "19123",
-        "vector": [],
-        "metadata": {
-            "article_id": "19123",
-            "title": "Ask HN: Should new grad go to startup or big company?",
-            "source": "",
-            "time": 1540081436,
-            "by": "ziyun",
-            "type": "story",
-            "text": "I will be graduating next semester. This would be the job hunting season. Just wondering if any of you have suggestions. Should I head into the startups or big company? Thanks!",
-            "chunk_index": null
-        }
-    },
-'''
 
 class VectorDB:
     def __init__(self):
@@ -46,7 +30,9 @@ class VectorDB:
                 else:
                     cleaned[key] = str(value)  # Convert other types to string
         return cleaned
+    
 
+    #Json format
     def save_to_vector_db(self, data: Dict[str, Any]) -> str:
         story_id = str(data['id'])  # Ensure ID is a string
         metadata = self.clean_metadata(data['metadata'])
@@ -63,7 +49,7 @@ class VectorDB:
         )
         
         return story_id
-
+    #Multiple ids of Json
     def save_multiple_to_vector_db(self, data_list: List[Dict[str, Any]]) -> List[str]:
         ids = []
         embeddings = []
@@ -100,6 +86,7 @@ class VectorDB:
         
         return ids
     
+    #pdf file processing
     def process_pdf(self, pdf_path: str) -> List[str]:
         """Process a PDF file and return a list of text chunks."""
         with open(pdf_path, 'rb') as file:
@@ -109,7 +96,9 @@ class VectorDB:
                 text += page.extract_text()
         
         return self.text_splitter.split_text(text)
+    
 
+    #save pdf into vector db
     def save_pdf_to_vector_db(self, pdf_path: str) -> List[str]:
         """Process a PDF and save its chunks to Chroma DB."""
         chunks = self.process_pdf(pdf_path)
@@ -134,6 +123,7 @@ class VectorDB:
         
         return ids
 
+    #save multiple_pdfs to vector_db
     def save_multiple_pdfs_to_vector_db(self, pdf_paths: List[str]) -> List[str]:
         """Process multiple PDFs and save their chunks to Chroma DB."""
         all_ids = []
@@ -239,21 +229,6 @@ class VectorDB:
         :return: A list containing the sampled items
         """
         return random.sample(data, min(sample_size, len(data)))
-
-# Usage example:
-# if __name__ == "__main__":
-#     vector_db = VectorDB()
-    
-#     # Load data from JSON file
-#     data = vector_db.load_json_data('data/data.json')
-    
-#     # Save all stories to Chroma DB
-#     saved_ids = vector_db.save_multiple_to_vector_db(data)
-#     print(f"Saved {len(saved_ids)} stories to Chroma DB")
-    
-#     # Example query
-#     query_results = vector_db.query_vector_db("dev laptop recommendations")
-#     print("Query results:", query_results)
 
 
 # # Create an instance of VectorDB
