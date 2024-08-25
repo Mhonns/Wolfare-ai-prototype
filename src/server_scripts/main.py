@@ -1,6 +1,6 @@
 #from src.pages import wolfare_controller
-from src.utils.config import load_environment_variables
-from src.database.vector_db import vector_db
+from utils.config import load_environment_variables
+from vector_db import vector_db
 #import os
 def main():
     #vector_db = VectorDB()
@@ -17,7 +17,6 @@ def main():
     # Example query
     query_results = vector_db.query_vector_db("dev laptop recommendations")
     print("Query results:", query_results)
-
 
 if __name__ == "__main__":
     main()

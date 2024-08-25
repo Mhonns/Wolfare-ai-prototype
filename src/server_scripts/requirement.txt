@@ -4,3 +4,7 @@ python-dotenv==1.0.1
 fastapi
 uvicorn
 pydantic
+langchain_core
+langchain_openai
+bs4
+pypdf
