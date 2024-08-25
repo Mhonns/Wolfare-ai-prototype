@@ -12,7 +12,7 @@ The goal of this project is to create a tool for Security Operation Centers (SOC
 ## How to Run (Prototype)
 0. Prerequisites
 Please ensure that python3, python3-pip were installed which enable to be executed via CLI.
-1. Clone the project to your machine and navigate to the `src` directory:
+1. Clone the project to your machine and navigate to the `src/client_scripts` directory:
 ```console
 $ cd src/client_scripts
 ```
@@ -22,5 +22,25 @@ $ pip3 install -r requirements.txt
 ```
 3. Run the service (controller):
 ```console
-$ python3 wolfare-controller.py
+$ python3 wolfare_controller.py
+```
+4. [Optional] For windows user please run
+```console
+$ python3 wolfare_controller_win.py
+```
+
+## How to deploy the server (Prototype)
+0. Prerequisites
+Please ensure that python3, python3-pip were installed which enable to be executed via CLI.
+1. Clone the project to your machine and navigate to the `src/server_scripts` directory:
+```console
+$ cd src/client_scripts
+```
+2. Install the required dependencies:
+```console
+$ pip3 install -r requirements.txt
+```
+3. To deploy the server please run
+```console
+$ python3 api_server.py
 ```

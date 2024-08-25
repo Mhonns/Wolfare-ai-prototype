@@ -56,9 +56,55 @@ def sendRequest(method, message=None):
     except:
         return "Error while sending the request", None
 
-def newsFormater(data):
-    # TODO please format the news data
-    pass
+def newsFormater(json_string):
+    json_string = json_string.strip("```json").strip("```")
+    data = json.loads(json_string)
+    html = ""
+    # Title
+    html += f"<title>{data['title']['original']}</title>\n"
+    
+    # Type
+    html += f"<h1>Type</h1>\n"
+    html += f"<p>{data['type']}</p>\n"
+
+    # Overview
+    html += f"<h2>Overview</h2>\n"
+    html += f"<p>{data['overview']}</p>\n"
+
+    # Threat Analysis
+    html += f"<h2>Threat Analysis</h2>\n"
+    html += f"<p>Threat Level: {data['threat_analysis']['threat_level']}</p>\n"
+    html += f"<p>Affected Systems: {', '.join(data['threat_analysis']['affected_systems'])}</p>\n"
+    html += f"<p>Potential Impact: {data['threat_analysis']['potential_impact']}</p>\n"
+
+    # Key Points
+    html += f"<h2>Key Points</h2>\n"
+    for point in data['key_points']:
+        html += f"<h3>{point['category']}</h3>\n"
+        html += f"<p>{point['description']}</p>\n"
+        html += f"<p>Relevance: {point['relevance']}</p>\n"
+
+    # Technical Details
+    html += f"<h2>Technical Details</h2>\n"
+    html += f"<p>CVE IDs: {', '.join(data['technical_details']['cve_ids']) if data['technical_details']['cve_ids'] else 'None'}</p>\n"
+    html += f"<p>IOCs: {', '.join(data['technical_details']['iocs']) if data['technical_details']['iocs'] else 'None'}</p>\n"
+    html += f"<p>Affected Versions: {', '.join(data['technical_details']['affected_versions'])}</p>\n"
+
+    # Actionable Insights
+    html += f"<h2>Actionable Insights</h2>\n"
+    for insight in data['actionable_insights']:
+        html += f"<h3>Priority: {insight['priority']}</h3>\n"
+        html += f"<p>Action: {insight['action']}</p>\n"
+        html += f"<p>Rationale: {insight['rationale']}</p>\n"
+
+    # Related Topics
+    html += f"<h2>Related Topics</h2>\n"
+    html += f"<ul>\n"
+    for topic in data['related_topics']:
+        html += f"<li>{topic}</li>\n"
+    html += f"</ul>\n"
+
+    return html
 
 def dataInputFormater(data):
     # TODO please format the data
@@ -71,6 +117,8 @@ def fetchNews():
         fetching = True
         date, news = sendRequest("News")
         fetching = False
+        if news != None:
+            news = newsFormater(news)
         return date, news
     else:
         return "Fail to retrieve latest date", "Waiting for the previous news to be fetched. please try again"
@@ -89,7 +137,6 @@ def pushToCloud(data):
     global pushing
     if pushing == False:
         pushing = True
-        print(data)
         # output = sendRequest("PUSH", data)
         output = "TODO send the push request"
         pushing = False
